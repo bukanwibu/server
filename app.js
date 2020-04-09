@@ -9,7 +9,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const routes = require('./routes')
-//const errorHandler = require('./middlewares/errorHandler')
+const errorHandler = require('./middlewares/errorHandler')
 const PORT = 3000
 
 const app = express()
@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use('/', routes)
 
-//app.use(errorHandler)
+app.use(errorHandler)
 
 app.listen(PORT, () => {
 	console.log('listening port ', PORT)
