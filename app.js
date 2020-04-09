@@ -3,7 +3,7 @@ if (process.env.NODE_ENV) {
 }
 
 //connect database
-//require('./config/mongoose')
+require('./config/mongoose')
 
 const express = require('express')
 const morgan = require('morgan')
@@ -28,3 +28,4 @@ app.listen(PORT, () => {
 })
 
 module.exports = app
+
