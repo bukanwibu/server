@@ -33,7 +33,7 @@ class UserController {
 			console.log('pas')
 			if (!isPassword) throw { message: 'invalid identity or password'}
 			let payload = {
-				_id: user._id,
+				id: user._id,
 				name: user.name,
 				email: user.email
 			}

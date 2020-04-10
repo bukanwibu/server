@@ -2,6 +2,7 @@ const express = require('express')
 
 const router = express.Router()
 const userRouter = require('../routes/userRouter')
+const textRouter = require('../routes/textRouter')
 
 router.get('/', function(req, res, next) {
 	console.log('masuk')
@@ -11,6 +12,7 @@ router.get('/', function(req, res, next) {
 })
 
 router.use('/users', userRouter)
+router.use('/texts', textRouter)
 
 
 module.exports = router
