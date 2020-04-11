@@ -45,12 +45,9 @@ class UserController {
 
 	static forgotPassword(req, res, next) {
 		if (!req.body.email) throw { message: "email is required" };
-		User.findOne({ email: req.body.email }).then(user => {
+		User.findOneAndUpdate({ email: req.body.email }, {resetToken: generateToken(req.body.email)},{new: true})
+		.then(user => {
 			if (!user) throw { message: "invalid email" };
-
-			// Generate resetToken
-			user.resetToken = generateToken(user.email);
-			user.save();
 
 			let transporter = nodemailer.createTransport({
 				service: "gmail",
@@ -63,6 +60,7 @@ class UserController {
 			let mailOptions = {
 				from: `${process.env.email}`,
 				to: `${user.email}`,
+				//to: 'devitas700@gmail.com',
 				subject: "Reset password notification",
 				html: `Hello are requested to reset password, <a href='${process.env.CLIENT_ADDRESS}/reset-password/${user.resetToken}'>click this link to continue resetting</a>`
 			};
@@ -76,7 +74,8 @@ class UserController {
 			});
 
 			res.status(200).json({ user });
-		});
+		})
+		.catch(next)
 	}
 	
 	

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 function generateToken(payload) {
-	return jwt.sign(payload, process.env.PRIVATE_KEY)
+	return jwt.sign(payload, process.env.PRIVATE_KEY, { expiresIn: '12h'})
 }
 
 function verifyToken(token) {
