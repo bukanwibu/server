@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const { hashPassword, checkPassword } = require("../helpers/bcrypt");
 const { generateToken, verifyToken } = require("../helpers/jwt");
+const nodemailer = require("nodemailer");
 
 class UserController {
 	static register(req, res, next) {
@@ -47,7 +48,33 @@ class UserController {
 		User.findOne({ email: req.body.email }).then(user => {
 			if (!user) throw { message: "invalid email" };
 
-			// Update password DB & send random password to email
+			// Generate resetToken
+			user.resetToken = generateToken(user.email);
+			user.save();
+
+			let transporter = nodemailer.createTransport({
+				service: "gmail",
+				auth: {
+					user: `${process.env.email}`,
+					pass: `${process.env.emailpass}`
+				}
+			});
+
+			let mailOptions = {
+				from: `${process.env.email}`,
+				to: `${user.email}`,
+				subject: "Reset password notification",
+				html: `Hello are requested to reset password, <a href='${process.env.CLIENT_ADDRESS}/reset-password/${user.resetToken}'>click this link to continue resetting</a>`
+			};
+
+			transporter.sendMail(mailOptions, function(error, info) {
+				if (error) {
+					console.log(error);
+				} else {
+					console.log("Email sent: " + info.response);
+				}
+			});
+
 			res.status(200).json({ user });
 		});
 	}
