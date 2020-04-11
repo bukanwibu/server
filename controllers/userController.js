@@ -42,6 +42,8 @@ class UserController {
 		})
 		.catch(next)
 	}
+	
+	
 }
 
 module.exports = UserController
