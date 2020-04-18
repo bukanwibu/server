@@ -1,6 +1,25 @@
 const { verifyToken } = require('../helpers/jwt')
 const { User, Text } = require('../models')
 
+function emailAuth(req, res, next) {
+	try {
+		let decodedToken = verifyToken(req.headers.token)
+		console.log(decodedToken)
+		User.findOne({email: decodedToken.email})
+		.then(user => {
+			if (user) {
+				req.emailUser = decodedToken.email
+				next()
+			} else {
+				next({ status: 401, message: 'authentication failed'})
+			}
+		})
+	} catch (error) {
+		next({ status: 401, message: err })
+	}
+}
+
+
 function authentication(req, res, next) {
 	try {
 		let decodedToken = verifyToken(req.headers.token)
@@ -38,5 +57,5 @@ function authorization(req, res, next) {
 
 }
 
-module.exports = { authentication, authorization }
+module.exports = { emailAuth, authentication, authorization }
 

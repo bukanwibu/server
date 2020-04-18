@@ -45,7 +45,8 @@ class UserController {
 
 	static forgotPassword(req, res, next) {
 		if (!req.body.email) throw { message: "email is required" };
-		User.findOneAndUpdate({ email: req.body.email }, {resetToken: generateToken(req.body.email)},{new: true})
+		let payload = {email: req.body.email}
+		User.findOneAndUpdate({ email: req.body.email }, {resetToken: generateToken(payload)},{new: true})
 		.then(user => {
 			if (!user) throw { message: "invalid email" };
 
@@ -77,7 +78,17 @@ class UserController {
 		})
 		.catch(next)
 	}
-	
+
+	static updatePassword(req, res, next) {
+		if (!req.body.password) throw { message: "password is required" };
+		let hashedPassword = hashPassword(req.body.password)
+		User.findOneAndUpdate({email: req.emailUser}, {password: hashedPassword}, {new: true})
+		.then(user => {
+			if (!user) throw { message: "user not found" };
+			res.status(200).json({user})
+		})
+		.catch(next)
+	}
 	
 }
 

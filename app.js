@@ -10,7 +10,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const routes = require("./routes");
 const errorHandler = require("./middlewares/errorHandler");
-const PORT = 3000;
+const PORT = 4000;
 
 const app = express();
 
