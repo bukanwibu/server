@@ -45,51 +45,63 @@ class UserController {
 
 	static forgotPassword(req, res, next) {
 		if (!req.body.email) throw { message: "email is required" };
-		let payload = {email: req.body.email}
-		User.findOneAndUpdate({ email: req.body.email }, {resetToken: generateToken(payload)},{new: true})
-		.then(user => {
-			if (!user) throw { message: "invalid email" };
+		let payload = { email: req.body.email };
+		User.findOneAndUpdate(
+			{ email: req.body.email },
+			{ resetToken: generateToken(payload) },
+			{ new: true }
+		)
+			.then(user => {
+				if (!user) throw { message: "invalid email" };
 
-			let transporter = nodemailer.createTransport({
-				service: "gmail",
-				auth: {
-					user: `${process.env.email}`,
-					pass: `${process.env.emailpass}`
-				}
-			});
+				let transporter = nodemailer.createTransport({
+					service: "gmail",
+					auth: {
+						user: `${process.env.email}`,
+						pass: `${process.env.emailpass}`
+					}
+				});
 
-			let mailOptions = {
-				from: `${process.env.email}`,
-				to: `${user.email}`,
-				//to: 'devitas700@gmail.com',
-				subject: "Reset password notification",
-				html: `Hello are requested to reset password, <a href='${process.env.CLIENT_ADDRESS}/reset-password/${user.resetToken}'>click this link to continue resetting</a>`
-			};
+				let url = `${process.env.CLIENT_ADDRESS}/reset-password/${user.resetToken}`;
 
-			transporter.sendMail(mailOptions, function(error, info) {
-				if (error) {
-					console.log(error);
-				} else {
-					console.log("Email sent: " + info.response);
-				}
-			});
+				let mailOptions = {
+					from: `${process.env.email}`,
+					to: `${user.email}`,
+					//to: 'devitas700@gmail.com',
+					subject: "Reset password notification",
+					html:
+						"Hello are requested to reset password, <a href='" +
+						url +
+						"'>click this link to continue resetting</a>"
+				};
 
-			res.status(200).json({ user });
-		})
-		.catch(next)
+				transporter.sendMail(mailOptions, function(error, info) {
+					if (error) {
+						console.log(error);
+					} else {
+						console.log("Email sent: " + info.response);
+					}
+				});
+
+				res.status(200).json({ user });
+			})
+			.catch(next);
 	}
 
 	static updatePassword(req, res, next) {
 		if (!req.body.password) throw { message: "password is required" };
-		let hashedPassword = hashPassword(req.body.password)
-		User.findOneAndUpdate({email: req.emailUser}, {password: hashedPassword}, {new: true})
-		.then(user => {
-			if (!user) throw { message: "user not found" };
-			res.status(200).json({user})
-		})
-		.catch(next)
+		let hashedPassword = hashPassword(req.body.password);
+		User.findOneAndUpdate(
+			{ email: req.emailUser },
+			{ password: hashedPassword },
+			{ new: true }
+		)
+			.then(user => {
+				if (!user) throw { message: "user not found" };
+				res.status(200).json({ user });
+			})
+			.catch(next);
 	}
-	
 }
 
 module.exports = UserController;
